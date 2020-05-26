@@ -12,35 +12,6 @@ app.use(bodyParser.urlencoded({ extended: false }))
 
 // Database Name
 const dbName = 'Opdracht_4_LES';
-
-// Create a new MongoClient
-// const client = new MongoClient(url);
-
-
-// (async ()=>{
-
-//     try{
-//         //throw "this is an error";
-//         await client.connect();
-
-//         console.log("Connected successfully to server");
-
-//         const db=client.db(dbName);
-
-//         // result=await insertDocuments(db);
-//         // console.log(result);
-
-//         // docs=await findDocuments(db);
-//         // console.log(docs);
-
-//         // client.close();
-
-//     }
-//     catch(error) {
-//         console.log(error);
-//     }
-
-// })();
   
 const insertData = (async (data) => {
     try{
@@ -82,19 +53,30 @@ const getData = (async () => {
     }
 })
 
-app.get('/', async(req, res) => {
-    var data = await getData();
-    console.log("all data");
-    console.log(data);
-    //res.sendDate(data);
+app.get('/', (req, res) => {
     res.sendFile(__dirname + '/index.html');
 });
 
+app.get('/script.js', (req, res) => {
+    res.sendFile(__dirname + '/script.js');
+});
+
+app.get('/getData', async(req, res) => {
+    var data = await getData();
+    //covnert data to array with column names as the first element
+    var chartData = [["Time", "Temperature inside", "temperature outside"]]
+    for(var atribute in data){
+        chartData[parseInt(atribute) + 1] = [data[atribute].time, parseInt(data[atribute].tempIn), parseInt(data[atribute].tempOut)];
+    }
+    //send data to script
+    res.send(chartData);
+})
+
 app.post('/addDataForm', async(req,res) => {
     req.body.time = (new Date()).toUTCString();
-    var result = await insertData(req.body);
-    console.log("insert");
-    console.log(result.result);
+    await insertData(req.body);
+    //send html file to refresh te page
+    res.sendFile(__dirname + '/index.html');
 });
 
 http.listen(3000, () => {
