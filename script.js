@@ -21,7 +21,7 @@ $.ajax({
     dataType: "json",
     complete: function(data) {
         for(var x = 1; x<data.responseJSON.length; x++ ){
-            data.responseJSON[x][0] = (new Date(data.responseJSON[x][0])).toLocaleTimeString();
+            data.responseJSON[x][0] = (new Date(data.responseJSON[x][0])).toLocaleString();
         }
         drawChart(data.responseJSON)
     }
